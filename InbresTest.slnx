@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <!-- Directory.Build.props должен находиться в корне Source, а не в Solution Items -->
+  <Folder Name="/Source/">
+    <File Path="Source\Directory.Build.props" />
+  </Folder>
+  <Project Path="Source\InbresTest.UI\InbresTest.UI.csproj" Type="Classic C#" />
+  <Project Path="Source\InbresTest.StartApp\InbresTest.StartApp.csproj" Type="Classic C#" />
+</Solution>
