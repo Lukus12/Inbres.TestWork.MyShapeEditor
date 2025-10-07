@@ -7,10 +7,11 @@
     <RootNamespace>InbresTest</RootNamespace>
     <IsTrimmable>True</IsTrimmable>
     <LangVersion>preview</LangVersion>
+
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
       <AvaloniaResource Include="Styles\**"/>
   </ItemGroup>
@@ -28,5 +29,6 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 </Project>
