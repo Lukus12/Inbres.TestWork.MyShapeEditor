@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:InbresTest.ViewModels"
-             xmlns:models="clr-namespace:InbresTest.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="InbresTest.Views.EditorControl"
              x:DataType="vm:EditorViewModel">
@@ -20,39 +19,37 @@
                     Command="{Binding AddRectangleCommand}" 
                     Margin="2"
                     Foreground="AliceBlue"/>
+            
+            <Button Content="Add Ellipse" 
+                    Command="{Binding AddEllipseCommand}" 
+                    Margin="2"
+                    Foreground="AliceBlue"/>
                     
             <Button Content="Delete" 
                     Command="{Binding DeleteSelectedShapeCommand}" 
                     Margin="2"
                     Foreground="AliceBlue"/>
-                    
-            <TextBox Text="Coord" Watermark="Coord" x:Name="Box">
-                <TextBox.KeyBindings>
-                    <KeyBinding x:DataType="vm:EditorViewModel" Command="{Binding }" Gesture="Enter"/>
-                </TextBox.KeyBindings>
-            </TextBox>
         </StackPanel>
         
         <!--Отрисовка фигур -->
         <Border Grid.Row="1" Background="Wheat" BorderBrush="#DDD" BorderThickness="1">
             <Grid>
-                <ItemsControl ItemsSource="{Binding Rectangles}">
+                <ItemsControl ItemsSource="{Binding Shapes}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="models:RectangleShape">
-                            <Canvas>
-                                <Rectangle Canvas.Left="{Binding X}"
-                                           Canvas.Top="{Binding Y}"
-                                           Width="{Binding Width}"
-                                           Height="{Binding Height}"
-                                           Fill="{Binding Fill}"
-                                           Stroke="Black"
-                                           StrokeThickness="1" />
-                            </Canvas>
+                        <DataTemplate>
+                            <Path Data="{Binding Geometry}"
+                                  Fill="{Binding Fill}"
+                                  Stroke="{Binding Stroke}"
+                                  StrokeThickness="{Binding StrokeThickness}">
+                                <Path.RenderTransform>
+                                    <TranslateTransform X="{Binding X}" Y="{Binding Y}" />
+                                </Path.RenderTransform>
+                            </Path>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

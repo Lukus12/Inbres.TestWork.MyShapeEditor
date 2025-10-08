@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 public partial class EditorViewModel : ViewModelBase
 {
     //координаты клика
-
     [Reactive] private double _clickX;
     [Reactive] private double _clickY;
     
@@ -19,8 +18,8 @@ public partial class EditorViewModel : ViewModelBase
     [Reactive] private bool _hasClick;
     
     
-    // коллекция прямоугольников
-    public ObservableCollection<RectangleShape> Rectangles { get; set; } = new();
+    // коллекция фигур
+    public ObservableCollection<ShapeBaseModel> Shapes { get; set; } = new();
     
     // команды
     [ReactiveCommand]
@@ -42,9 +41,21 @@ public partial class EditorViewModel : ViewModelBase
             return;
         };
         
-        Rectangles.Add(new RectangleShape { X = ClickX, Y = ClickY });
+        Shapes.Add(new RectangleShapeModel { X = ClickX, Y = ClickY });
         
         System.Diagnostics.Debug.WriteLine($"Added rect at ({ClickX}, {ClickY})");
+        
+        HasClick = false;
+    }
+    
+    [ReactiveCommand]
+    private void AddEllipse()
+    {
+        if (!HasClick) return;
+        
+        Shapes.Add(new EllipseShapeModel { X = ClickX, Y = ClickY });
+        
+        System.Diagnostics.Debug.WriteLine($"Added ellipse at ({ClickX}, {ClickY})");
         
         HasClick = false;
     }
