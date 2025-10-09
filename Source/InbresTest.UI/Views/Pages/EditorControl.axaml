@@ -34,10 +34,11 @@
         <!--Отрисовка фигур -->
         <Border Grid.Row="1" Background="Wheat" BorderBrush="#DDD" BorderThickness="1">
             <Grid>
-                <ItemsControl ItemsSource="{Binding Shapes}">
+                <ItemsControl ItemsSource="{Binding Shapes}" 
+                              PointerPressed="ClickItem_PointerPressed">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <Canvas />
+                            <Canvas Background="Transparent"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -45,7 +46,8 @@
                             <Path Data="{Binding Geometry}"
                                   Fill="{Binding Fill}"
                                   Stroke="{Binding Stroke}"
-                                  StrokeThickness="{Binding StrokeThickness}">
+                                  StrokeThickness="{Binding StrokeThickness}"
+                                  >
                                 <Path.RenderTransform>
                                     <TranslateTransform X="{Binding X}" Y="{Binding Y}" />
                                 </Path.RenderTransform>
@@ -53,10 +55,10 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
-                <Canvas Name="ClickCanvas"
+                <!--<Canvas Name="ClickCanvas"
                         Background="Transparent"
-                        PointerPressed="ClickCanvas_PointerPressed" />
+                        PointerPressed="ClickCanvas_PointerPressed" 
+                />-->
             </Grid>
         </Border>
     </Grid>

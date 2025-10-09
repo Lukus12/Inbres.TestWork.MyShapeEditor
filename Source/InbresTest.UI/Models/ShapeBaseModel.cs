@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Avalonia.Controls;
+using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.Models;
@@ -11,15 +12,29 @@ using Avalonia.Media;
 
 public abstract class ShapeBaseModel: ReactiveObject
 {
+    private bool _isSelected;
     [Reactive] public double X { get; set; }
     [Reactive] public double Y { get; set; }
     [Reactive] public double Width { get; set; } = 40;
     [Reactive] public double Height { get; set; } = 40;
     [Reactive] public string Fill { get; set; } = "Red";
-    [Reactive] public string Stroke { get; set; } = "Black";
-    [Reactive] public double StrokeThickness { get; set; } = 1;
-
-    // Геометрия фигуры - будет использоваться в Path.Data
+    
     public abstract Geometry Geometry { get; }
+    
+    public string Stroke => IsSelected ? "MediumBlue" : "Black";
+    public double StrokeThickness => IsSelected ? 3 : 1;
+
+    [Reactive]
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isSelected, value);
+            // Уведомляем об изменении Stroke и StrokeThickness
+            this.RaisePropertyChanged(nameof(Stroke));
+            this.RaisePropertyChanged(nameof(StrokeThickness));
+        }
+    }
 
 }

@@ -17,6 +17,8 @@ public partial class EditorViewModel : ViewModelBase
     // проверка клика
     [Reactive] private bool _hasClick;
     
+    // дейсвтия с фигурой
+    [Reactive] private ShapeBaseModel _hasSelectedShape;
     
     // коллекция фигур
     public ObservableCollection<ShapeBaseModel> Shapes { get; set; } = new();
@@ -25,7 +27,7 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void CanvasClick(Point point)
     {
-        System.Diagnostics.Debug.WriteLine($"OnCanvasClick called! X={point.X}, Y={point.Y}");
+        DeselectAll();
         ClickX = point.X;
         ClickY = point.Y;
         HasClick = true;
@@ -63,7 +65,29 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void DeleteSelectedShape()
     {
-        
+        Shapes.Remove(HasSelectedShape);
     }
 
+    [ReactiveCommand]
+    private void SelectedShape(ShapeBaseModel shape)
+    {
+        DeselectAll();
+        foreach (var shapeModel in Shapes)
+        {
+            shapeModel.IsSelected = false;
+        }
+        shape.IsSelected = true;
+        HasSelectedShape =  shape;
+        
+        System.Diagnostics.Debug.WriteLine($"Shape set to Selected");
+    }
+
+    private void DeselectAll()
+    {
+        foreach (var shapeModel in Shapes) 
+        {
+            shapeModel.IsSelected = false;
+        }
+        HasSelectedShape = null;
+    }
 }
