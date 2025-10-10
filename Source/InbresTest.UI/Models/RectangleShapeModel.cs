@@ -1,7 +1,5 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Media;
-using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.Models;
 

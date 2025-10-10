@@ -18,7 +18,7 @@ public partial class EditorViewModel : ViewModelBase
     [Reactive] private bool _hasClick;
     
     // дейсвтия с фигурой
-    [Reactive] private ShapeBaseModel _hasSelectedShape;
+    [Reactive] private ShapeBaseModel? _hasSelectedShape;
     
     // коллекция фигур
     public ObservableCollection<ShapeBaseModel> Shapes { get; set; } = new();
@@ -27,7 +27,7 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void CanvasClick(Point point)
     {
-        DeselectAll();
+        Deselect();
         ClickX = point.X;
         ClickY = point.Y;
         HasClick = true;
@@ -65,29 +65,37 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void DeleteSelectedShape()
     {
-        Shapes.Remove(HasSelectedShape);
+        if(HasSelectedShape!=null) Shapes.Remove(HasSelectedShape);
     }
 
     [ReactiveCommand]
     private void SelectedShape(ShapeBaseModel shape)
     {
-        DeselectAll();
-        foreach (var shapeModel in Shapes)
-        {
-            shapeModel.IsSelected = false;
-        }
+        Deselect();
         shape.IsSelected = true;
         HasSelectedShape =  shape;
         
         System.Diagnostics.Debug.WriteLine($"Shape set to Selected");
     }
 
-    private void DeselectAll()
+    private void Deselect()
     {
-        foreach (var shapeModel in Shapes) 
-        {
-            shapeModel.IsSelected = false;
-        }
+        if(HasSelectedShape!=null) HasSelectedShape.IsSelected = false;
         HasSelectedShape = null;
+    }
+
+    [ReactiveCommand]
+    private void MovedShape(Point delta)
+    {
+        if(HasSelectedShape == null) return;
+        
+        if (HasSelectedShape.X >= 0 && HasSelectedShape.Y >= 0)
+        {
+            HasSelectedShape.X += delta.X;
+            HasSelectedShape.Y += delta.Y;
+        }
+
+        if (HasSelectedShape.X < 0) HasSelectedShape.X = 0;
+        if (HasSelectedShape.Y < 0) HasSelectedShape.Y = 0;
     }
 }

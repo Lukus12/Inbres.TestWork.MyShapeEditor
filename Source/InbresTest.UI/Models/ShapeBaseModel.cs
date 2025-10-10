@@ -4,17 +4,26 @@ using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.Models;
 
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using Avalonia.Media;
 
 
 public abstract class ShapeBaseModel: ReactiveObject
 {
     private bool _isSelected;
-    [Reactive] public double X { get; set; }
-    [Reactive] public double Y { get; set; }
+    private double _x;
+    private double _y;
+    
+    public double X
+    {
+        get => _x;
+        set => this.RaiseAndSetIfChanged(ref _x, value);
+    }
+    public double Y
+    {
+        get => _y;
+        set => this.RaiseAndSetIfChanged(ref _y, value);
+    }
+    
     [Reactive] public double Width { get; set; } = 40;
     [Reactive] public double Height { get; set; } = 40;
     [Reactive] public string Fill { get; set; } = "Red";

@@ -35,7 +35,10 @@
         <Border Grid.Row="1" Background="Wheat" BorderBrush="#DDD" BorderThickness="1">
             <Grid>
                 <ItemsControl ItemsSource="{Binding Shapes}" 
-                              PointerPressed="ClickItem_PointerPressed">
+                              PointerPressed="ClickItem_PointerPressed"
+                              PointerMoved="ClickItem_PointerMoved"
+                              PointerReleased="ClickItem_PointerReleased"
+                              >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas Background="Transparent"/>
@@ -55,10 +58,6 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <!--<Canvas Name="ClickCanvas"
-                        Background="Transparent"
-                        PointerPressed="ClickCanvas_PointerPressed" 
-                />-->
             </Grid>
         </Border>
     </Grid>
