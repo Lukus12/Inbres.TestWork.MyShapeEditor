@@ -15,9 +15,9 @@ public abstract partial class ShapeBaseModel: ReactiveObject
     [Reactive] public partial double Y { get; set; }
 
 
-    [Reactive] public double Width { get; set; } = 40;
-    [Reactive] public double Height { get; set; } = 40;
-    [Reactive] public string Fill { get; set; } = "Red";
+    [Reactive] public partial double Width { get; set; } = 50;
+    [Reactive] public partial double Height { get; set; } = 50;
+    [Reactive] public partial string Fill { get; set; } = "Red";
     
     public abstract Geometry Geometry { get; }
     

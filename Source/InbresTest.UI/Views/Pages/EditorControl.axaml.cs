@@ -13,6 +13,8 @@ public partial class EditorControl : UserControl
     private Point _lastPointerPosition;
     private ShapeBaseModel? _draggedShape;
     
+    private string? _activeHandleType = null;
+    
     public EditorControl()
     {
         InitializeComponent();
@@ -21,8 +23,7 @@ public partial class EditorControl : UserControl
     private void ClickItem_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (DataContext is not EditorViewModel vm) return;
-
-        //var clickCanvas = this.FindControl<Canvas>("ClickCanvas");
+        
         var itemsControl = sender as ItemsControl;
         if (itemsControl == null) return;
 
@@ -31,12 +32,30 @@ public partial class EditorControl : UserControl
         
         System.Diagnostics.Debug.WriteLine($"🖱️ Click at: {pos.X}, {pos.Y}");
         
+        if (e.Source is Border handleBorder && handleBorder.DataContext is ShapeBaseModel shapeBorder)
+        {
+            // Проверяем, что это действительно маркер, а не часть Path
+            if (handleBorder.Parent is Canvas container && container.DataContext == shapeBorder)
+            {
+                System.Diagnostics.Debug.WriteLine("Marker found.");
+                
+                _draggedShape = shapeBorder;
+                _activeHandleType = handleBorder.Tag?.ToString(); 
+            
+                e.Pointer.Capture(itemsControl); 
+                e.Handled = true;
+                return;
+            }
+        }
+        
+        
         if (e.Source is Path path && path.DataContext is ShapeBaseModel shape)
         {
             System.Diagnostics.Debug.WriteLine($"Shape found at: {pos.X}, {pos.Y}");
             vm.SelectedShapeCommand.Execute(shape).Subscribe();
             
             _draggedShape = shape;
+            _activeHandleType = null;
             
             e.Pointer.Capture(itemsControl); //элемент захватывает указатель
             e.Handled = true; // текущий элемент занимается обработкой, родительские элементы не должны
@@ -63,8 +82,12 @@ public partial class EditorControl : UserControl
         var delta = currentPosition - _lastPointerPosition;
         
         System.Diagnostics.Debug.WriteLine($"Moving shape: delta({delta.X}, {delta.Y}), new position({_draggedShape.X + delta.X}, {_draggedShape.Y + delta.Y})");
-        
-        vm.MovedShapeCommand.Execute(delta).Subscribe();
+
+        if (_activeHandleType != null)
+        {
+            vm.ResizedShapeCommand.Execute(new object[] { _activeHandleType, delta}).Subscribe();
+        }
+        else vm.MovedShapeCommand.Execute(delta).Subscribe();
 
         _lastPointerPosition = currentPosition;
         e.Handled = true;
@@ -73,6 +96,7 @@ public partial class EditorControl : UserControl
     private void ClickItem_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         _draggedShape = null;
+        _activeHandleType = null;
         e.Pointer.Capture(null);
         e.Handled = true;
     }

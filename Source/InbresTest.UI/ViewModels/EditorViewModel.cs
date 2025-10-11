@@ -90,4 +90,22 @@ public partial class EditorViewModel : ViewModelBase
         HasSelectedShape.MoveTo(delta);
        
     }
+
+    [ReactiveCommand]
+    private void ResizedShape(object[] args)
+    {
+        if(HasSelectedShape == null) return;
+        if(args[0] is not string type || args[1] is not Point delta) return;
+
+        switch (type)
+        {
+            case "TopCenter":
+                HasSelectedShape.Y += delta.Y;
+                HasSelectedShape.Height += delta.Y;
+                break;
+        }
+        
+           
+        
+    }
 }

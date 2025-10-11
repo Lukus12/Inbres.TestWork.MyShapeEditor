@@ -3,9 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:InbresTest.ViewModels"
+             xmlns:converters="clr-namespace:InbresTest.Views.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="InbresTest.Views.Pages.EditorControl"
              x:DataType="vm:EditorViewModel">
+    
+    <UserControl.Resources>
+        <converters:HandleOffsetConverter x:Key="HandleOffsetConverter" />
+        <converters:RatioToSizeConverter x:Key="RatioToSizeConverter" />
+    </UserControl.Resources>
     
     <Grid RowDefinitions="Auto,*">
         <!-- Панель инструментов -->
@@ -46,15 +52,61 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Path Data="{Binding Geometry}"
-                                  Fill="{Binding Fill}"
-                                  Stroke="{Binding Stroke}"
-                                  StrokeThickness="{Binding StrokeThickness}"
-                                  >
-                                <Path.RenderTransform>
+                            <!-- Внешний контейнер, который управляет позицией фигуры (X, Y) -->
+                            <Canvas Width="{Binding Width}" Height="{Binding Height}" ClipToBounds="False">
+                                <Canvas.RenderTransform>
                                     <TranslateTransform X="{Binding X}" Y="{Binding Y}" />
-                                </Path.RenderTransform>
-                            </Path>
+                                </Canvas.RenderTransform>
+
+                                <!-- 1. Фигура -->
+                                <Path Data="{Binding Geometry}"
+                                      Fill="{Binding Fill}"
+                                      Stroke="{Binding Stroke}"
+                                      StrokeThickness="{Binding StrokeThickness}"
+                                      Canvas.Left="0" Canvas.Top="0" 
+                                />
+
+                                <!-- Маркер 1: Верхний Левый -->
+                                <Border Width="{Binding Width, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Height="{Binding Height, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Background="LimeGreen" 
+                                        CornerRadius="10"
+                                        IsVisible="{Binding IsSelected}"
+                                        Tag="TopLeft"
+                                        
+                                        Canvas.Left="{Binding Width, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}" 
+                                        Canvas.Top="{Binding Height, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}"
+                                        
+                                        PointerPressed="ClickItem_PointerPressed"
+                                        PointerMoved="ClickItem_PointerMoved"
+                                        PointerReleased="ClickItem_PointerReleased"
+                                />
+
+                                <!-- Маркер 2: Верхний Центральный -->
+                                <Border Width="{Binding Width, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Height="{Binding Height, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Background="LimeGreen"
+                                        CornerRadius="10"
+                                        IsVisible="{Binding IsSelected}"
+                                        Tag="TopCenter"
+                                        
+                                        Canvas.Left="{Binding Width, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Center}" 
+                                        Canvas.Top="{Binding Height, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}"
+                                />
+
+                                <!-- Маркер 3: Левый Центральный -->
+                                <Border Width="{Binding Width, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Height="{Binding Height, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
+                                        Background="LimeGreen"
+                                        CornerRadius="10"
+                                        IsVisible="{Binding IsSelected}"
+                                        Tag="LeftCenter"
+                                        
+                                        Canvas.Left="{Binding Width, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}" 
+                                        Canvas.Top="{Binding Height, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Center}"
+                                />
+
+                            </Canvas>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
