@@ -6,7 +6,7 @@ using Avalonia.Input;
 using InbresTest.Models;
 using InbresTest.ViewModels;
 
-namespace InbresTest.Views;
+namespace InbresTest.Views.Pages;
 
 public partial class EditorControl : UserControl
 {

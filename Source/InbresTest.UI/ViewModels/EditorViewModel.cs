@@ -1,6 +1,4 @@
-﻿
-
-using Avalonia;
+﻿using Avalonia;
 using InbresTest.Models;
 using ReactiveUI.SourceGenerators;
 
@@ -41,7 +39,7 @@ public partial class EditorViewModel : ViewModelBase
         {
             System.Diagnostics.Debug.WriteLine("No click position!");
             return;
-        };
+        }
         
         Shapes.Add(new RectangleShapeModel { X = ClickX, Y = ClickY });
         
@@ -89,13 +87,7 @@ public partial class EditorViewModel : ViewModelBase
     {
         if(HasSelectedShape == null) return;
         
-        if (HasSelectedShape.X >= 0 && HasSelectedShape.Y >= 0)
-        {
-            HasSelectedShape.X += delta.X;
-            HasSelectedShape.Y += delta.Y;
-        }
-
-        if (HasSelectedShape.X < 0) HasSelectedShape.X = 0;
-        if (HasSelectedShape.Y < 0) HasSelectedShape.Y = 0;
+        HasSelectedShape.MoveTo(delta);
+       
     }
 }
