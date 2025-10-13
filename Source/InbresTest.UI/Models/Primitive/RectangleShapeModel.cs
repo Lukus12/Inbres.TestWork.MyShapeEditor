@@ -1,9 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 
-namespace InbresTest.Models;
+namespace InbresTest.Models.Primitive;
 
-public class RectangleShapeModel : ShapeBaseModel
+public class RectangleShapeModel : PrimitiveShapeModel
 {
     public override Geometry Geometry  =>
          new RectangleGeometry(new Rect(0, 0, Width, Height));

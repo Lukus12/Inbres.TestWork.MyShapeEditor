@@ -1,5 +1,7 @@
 ﻿using Avalonia;
 using InbresTest.Models;
+using InbresTest.Models.Curves;
+using InbresTest.Models.Primitive;
 using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.ViewModels;
@@ -30,6 +32,26 @@ public partial class EditorViewModel : ViewModelBase
         ClickY = point.Y;
         HasClick = true;
         System.Diagnostics.Debug.WriteLine($"HasClick set to true");
+    }
+
+    [ReactiveCommand]
+    private void AddSquareBezier()
+    {
+        if (!HasClick) return;
+        
+        var newCurve = new BezierSquareShapeModel 
+        { 
+            X = ClickX, 
+            Y = ClickY,
+            // Установим начальные значения, чтобы она была видна
+            StartPoint = new Point(0, 25),
+            ControlPoint = new Point(50, 100),
+            EndPoint = new Point(100, 25),
+        };
+        
+        Shapes.Add(newCurve);
+        
+        HasClick = false;
     }
 
     [ReactiveCommand]

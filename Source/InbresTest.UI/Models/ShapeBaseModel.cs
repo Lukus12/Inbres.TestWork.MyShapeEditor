@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -11,39 +10,20 @@ using Avalonia.Media;
 public abstract partial class ShapeBaseModel : ReactiveObject
 {
     private bool _isSelected;
-    private double _width = 50;
-    private double _height = 50;
-
-    private int IndexColor = 1;
-    private static string[] _color =  { "Red", "Green", "Yellow", "Black", "White" };
 
     [Reactive] public partial double X { get; set; }
     [Reactive] public partial double Y { get; set; }
-
-    public double Width
-    {
-        get => _width;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _width, value);
-            this.RaisePropertyChanged(nameof(Geometry));
-        } 
-    }
-
-    public double Height
-    {
-        get => _height;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _height, value);
-            this.RaisePropertyChanged(nameof(Geometry));
-        } 
-    }
     
+    public virtual double Width { get; set; }
+
+    public virtual double Height { get; set; }
     
-    [Reactive] public partial string Fill { get; set; } = _color[0];
+    public virtual string? Fill {get;set;}
     
     public abstract Geometry Geometry { get; }
+    
+    
+    //[Reactive] public virtual bool IsResizable { get; set; } = true; 
     
     public string Stroke => IsSelected ? "MediumBlue" : "Black";
     public double StrokeThickness => IsSelected ? 3 : 1;
@@ -74,39 +54,6 @@ public abstract partial class ShapeBaseModel : ReactiveObject
         if (Y < 0) Y = 0;
     }
 
-    public void ResizeShape(string type, Point delta)
-    {
-        switch (type)
-        {
-            case "TopCenter":
-                
-                Y += delta.Y;
-                Height -= delta.Y;
-                
-                break;
-            
-            case "LeftCenter":
-                
-                X += delta.X;
-                Width -= delta.X;
-                
-                break;
-            
-            case "TopLeft":
-                
-                X += delta.X;
-                Y += delta.Y;
-                
-                Width -= delta.X;
-                Height -= delta.Y;
-                
-                break;
-        }
-    }
-
-    public void ChangeColor()
-    {
-        Fill = _color[IndexColor++ % _color.Length];
-    }
-
+    public virtual void ResizeShape(string type, Point delta){}
+    public virtual void ChangeColor(){}
 }

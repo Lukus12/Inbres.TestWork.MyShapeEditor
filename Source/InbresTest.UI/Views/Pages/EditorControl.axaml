@@ -30,6 +30,12 @@
                     Command="{Binding AddEllipseCommand}" 
                     Margin="2"
                     Foreground="AliceBlue"/>
+            
+            <Button Content="Add SquareBezier"
+                    Command="{Binding AddSquareBezierCommand}"
+                    Margin="2"
+                    Foreground="AliceBlue"
+                />
                     
             <Button Content="Delete" 
                     Command="{Binding DeleteSelectedShapeCommand}" 
@@ -72,8 +78,10 @@
                                         Height="{Binding Height, Converter={StaticResource RatioToSizeConverter}, ConverterParameter=5}" 
                                         Background="LimeGreen" 
                                         CornerRadius="10"
-                                        IsVisible="{Binding IsSelected}"
                                         Tag="TopLeft"
+                                        
+                                        IsVisible="{Binding IsSelected}"
+                                        
                                         
                                         Canvas.Left="{Binding Width, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}" 
                                         Canvas.Top="{Binding Height, Converter={StaticResource HandleOffsetConverter}, ConverterParameter=Corner}"
