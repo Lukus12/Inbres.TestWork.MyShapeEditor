@@ -100,4 +100,14 @@ public partial class EditorControl : UserControl
         e.Pointer.Capture(null);
         e.Handled = true;
     }
+
+    private void ClickItem_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (DataContext is not EditorViewModel vm) return;
+        
+        var itemsControl = sender as ItemsControl;
+        if (itemsControl == null) return;
+        
+        vm.ChangeColorCommand.Execute().Subscribe();
+    }
 }

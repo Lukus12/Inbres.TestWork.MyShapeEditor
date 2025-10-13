@@ -44,6 +44,7 @@
                               PointerPressed="ClickItem_PointerPressed"
                               PointerMoved="ClickItem_PointerMoved"
                               PointerReleased="ClickItem_PointerReleased"
+                              DoubleTapped = "ClickItem_DoubleTapped"
                               >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

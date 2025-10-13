@@ -99,4 +99,11 @@ public partial class EditorViewModel : ViewModelBase
         
         HasSelectedShape.ResizeShape(type, delta);
     }
+
+    [ReactiveCommand]
+    private void ChangeColor()
+    {
+        if(HasSelectedShape == null) return;
+        HasSelectedShape.ChangeColor();
+    }
 }

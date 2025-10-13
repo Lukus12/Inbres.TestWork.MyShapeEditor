@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -7,12 +8,15 @@ namespace InbresTest.Models;
 using Avalonia.Media;
 
 
-public abstract partial class ShapeBaseModel: ReactiveObject
+public abstract partial class ShapeBaseModel : ReactiveObject
 {
     private bool _isSelected;
     private double _width = 50;
     private double _height = 50;
-    
+
+    private int IndexColor = 1;
+    private static string[] _color =  { "Red", "Green", "Yellow", "Black", "White" };
+
     [Reactive] public partial double X { get; set; }
     [Reactive] public partial double Y { get; set; }
 
@@ -37,7 +41,7 @@ public abstract partial class ShapeBaseModel: ReactiveObject
     }
     
     
-    [Reactive] public partial string Fill { get; set; } = "Red";
+    [Reactive] public partial string Fill { get; set; } = _color[0];
     
     public abstract Geometry Geometry { get; }
     
@@ -98,6 +102,11 @@ public abstract partial class ShapeBaseModel: ReactiveObject
                 
                 break;
         }
+    }
+
+    public void ChangeColor()
+    {
+        Fill = _color[IndexColor++ % _color.Length];
     }
 
 }
