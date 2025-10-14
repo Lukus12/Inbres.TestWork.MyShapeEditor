@@ -32,7 +32,7 @@
                     Foreground="AliceBlue"/>
             
             <Button Content="Add SquareBezier"
-                    Command="{Binding AddSquareBezierCommand}"
+                    Command="{Binding StartBezierCreationCommand}"
                     Margin="2"
                     Foreground="AliceBlue"
                 />

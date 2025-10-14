@@ -36,6 +36,20 @@ public abstract partial class PrimitiveShapeModel: ShapeBaseModel
     
     public override void ResizeShape(string type, Point delta)
     {
+        if(Height < 0)
+        {
+            Height = 0;
+            Y -= delta.Y;
+            return;
+        }
+
+        if (Width < 0)
+        {
+            Width = 0;
+            X -= delta.X;
+            return;
+        }
+        
         switch (type)
         {
             case "TopCenter":

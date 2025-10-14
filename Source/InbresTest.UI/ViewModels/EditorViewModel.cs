@@ -1,7 +1,9 @@
 ﻿using Avalonia;
+using Avalonia.Media;
 using InbresTest.Models;
 using InbresTest.Models.Curves;
 using InbresTest.Models.Primitive;
+using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.ViewModels;
@@ -23,35 +25,102 @@ public partial class EditorViewModel : ViewModelBase
     // коллекция фигур
     public ObservableCollection<ShapeBaseModel> Shapes { get; set; } = new();
     
+    //параметры безье
+    [Reactive] private CreationMode _currentCreationMode = CreationMode.None;
+    [Reactive] private BezierSquareShapeModel? _temporaryBezier;
+    
+    // состояния кривой
+    public enum CreationMode
+    {
+        None,
+        AwaitingStartPoint,
+        AwaitingControlPoint,
+        AwaitingEndPoint
+    }
+    
+    
     // команды
+    
     [ReactiveCommand]
     private void CanvasClick(Point point)
     {
-        Deselect();
-        ClickX = point.X;
-        ClickY = point.Y;
-        HasClick = true;
-        System.Diagnostics.Debug.WriteLine($"HasClick set to true");
+        if (CurrentCreationMode != CreationMode.None)
+        {
+            HandleBezierCreationClick(point);
+        }
+        else
+        {
+            Deselect();
+            ClickX = point.X;
+            ClickY = point.Y;
+            HasClick = true;
+            System.Diagnostics.Debug.WriteLine($"Regular Click set at: {point.X}, {point.Y}");
+        }
     }
-
+    
     [ReactiveCommand]
-    private void AddSquareBezier()
+    private void StartBezierCreation()
     {
-        if (!HasClick) return;
+        if (CurrentCreationMode != CreationMode.None) return;
+    
+        Deselect();
+        CurrentCreationMode = CreationMode.AwaitingStartPoint;
         
-        var newCurve = new BezierSquareShapeModel 
-        { 
-            X = ClickX, 
-            Y = ClickY,
-            // Установим начальные значения, чтобы она была видна
-            StartPoint = new Point(0, 25),
-            ControlPoint = new Point(50, 100),
-            EndPoint = new Point(100, 25),
-        };
-        
-        Shapes.Add(newCurve);
-        
-        HasClick = false;
+        TemporaryBezier = null; 
+    }
+    
+    private void HandleBezierCreationClick(Point point)
+    {
+        switch (CurrentCreationMode)
+        {
+            case CreationMode.AwaitingStartPoint:
+                TemporaryBezier = new BezierSquareShapeModel
+                {
+                    X = point.X,
+                    Y = point.Y,
+                    StartPoint = new Point(0, 0),
+                    IsBeingPlaced = true 
+                };
+                
+                TemporaryBezier.IsSelected = true; 
+                Shapes.Add(TemporaryBezier);
+                
+                CurrentCreationMode = CreationMode.AwaitingControlPoint;
+                break;
+
+            case CreationMode.AwaitingControlPoint:
+                if (TemporaryBezier == null)
+                {
+                    CurrentCreationMode = CreationMode.None;
+                    return;
+                }
+                
+                TemporaryBezier.ControlPoint = new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y);
+                
+                // отрисовывка линии от A до B
+                TemporaryBezier.UpdateGeometry();
+                
+                CurrentCreationMode = CreationMode.AwaitingEndPoint;
+                
+                break;
+
+            case CreationMode.AwaitingEndPoint:
+                if (TemporaryBezier == null) return;
+                
+                TemporaryBezier.EndPoint = new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y);
+                
+                // отрисовка полной кривой
+                TemporaryBezier.UpdateGeometry(); 
+                
+                TemporaryBezier.IsBeingPlaced = false; 
+                TemporaryBezier.IsSelected = false; 
+                
+                TemporaryBezier = null;
+                CurrentCreationMode = CreationMode.None;
+                System.Diagnostics.Debug.WriteLine("Bezier Creation Complete.");
+                
+                break;
+        }
     }
 
     [ReactiveCommand]
@@ -91,9 +160,17 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void SelectedShape(ShapeBaseModel shape)
     {
+        
+        if (CurrentCreationMode != CreationMode.None) return;
+        
         Deselect();
         shape.IsSelected = true;
         HasSelectedShape =  shape;
+        
+        if (shape is BezierSquareShapeModel bezier)
+        {
+            bezier.IsBeingPlaced = false;
+        }
         
         System.Diagnostics.Debug.WriteLine($"Shape set to Selected");
     }

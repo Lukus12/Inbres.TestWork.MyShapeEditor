@@ -13,7 +13,7 @@ public partial class EditorControl : UserControl
     private Point _lastPointerPosition;
     private ShapeBaseModel? _draggedShape;
     
-    private string? _activeHandleType = null;
+    private string? _activeHandleType;
     
     public EditorControl()
     {
@@ -31,6 +31,13 @@ public partial class EditorControl : UserControl
         _lastPointerPosition = pos;
         
         System.Diagnostics.Debug.WriteLine($"🖱️ Click at: {pos.X}, {pos.Y}");
+        
+        if (vm.CurrentCreationMode != EditorViewModel.CreationMode.None)
+        {
+            vm.CanvasClickCommand.Execute(pos).Subscribe();
+            e.Handled = true;
+            return;
+        }
         
         if (e.Source is Border handleBorder && handleBorder.DataContext is ShapeBaseModel shapeBorder)
         {

@@ -23,8 +23,6 @@ public abstract partial class ShapeBaseModel : ReactiveObject
     public abstract Geometry Geometry { get; }
     
     
-    //[Reactive] public virtual bool IsResizable { get; set; } = true; 
-    
     public string Stroke => IsSelected ? "MediumBlue" : "Black";
     public double StrokeThickness => IsSelected ? 3 : 1;
 
