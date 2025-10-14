@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 using ReactiveUI;
@@ -6,58 +7,69 @@ using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.Models.Curves;
 
-public class BezierSquareShapeModel: ShapeBaseModel
+public partial class BezierSquareShapeModel: ShapeBaseModel
 {
-    [Reactive] public Point StartPoint { get; set; } = new Point(0, 0);
-    [Reactive] public Point ControlPoint { get; set; } = new Point(50, 100); // Пример смещения
-    [Reactive] public Point EndPoint { get; set; } = new Point(100, 0); 
-
-    
+    [Reactive] private Point _startPoint;
+    [Reactive] private List<Point>? _controlPoint = new(); 
+    [Reactive] private Point _endPoint;
     
     // свойство для отслеживания, что фигура в процессе размещения
-    [Reactive] public bool IsBeingPlaced { get; set; } = true;
+    [Reactive] private bool _isBeingPlaced = true;
     
     public override Geometry Geometry
+{
+    get
     {
-        get
-        {
-            var pathGeometry = new PathGeometry();
-            var pathFigure = new PathFigure { StartPoint = StartPoint };
-            pathFigure.IsClosed = false;
+        var pathGeometry = new PathGeometry();
+        var pathFigure = new PathFigure { StartPoint = StartPoint };
+        pathFigure.IsClosed = false;
 
-            if (IsBeingPlaced)
+        if (ControlPoint == null) 
+        {
+            return pathGeometry;
+        }
+        
+        int pointCount = ControlPoint.Count;
+
+        if (IsBeingPlaced)
+        {
+
+            if (pointCount == 0) return pathGeometry;
+
+            for (int i = 0; i < pointCount; i++)
             {
-                // 1. AwaitingStartPoint
-                if (ControlPoint.X == 50 && ControlPoint.Y == 100 && EndPoint.X == 100 && EndPoint.Y == 0)
+                pathFigure.Segments?.Add(new LineSegment { Point = ControlPoint[i] });
+            }
+            
+        }
+        else
+        {
+            for (int i = 0; i < pointCount; i += 2)
+            {
+                if (i + 1 < pointCount)
                 {
-                     // Рисуем только начальную точку A.
-                     // Возвращаем пустую геометрию, пока нет контрольной точки, чтобы избежать артефактов
-                     return pathGeometry;
-                }
-                
-                // 2. AwaitingControlPoint
-                if (EndPoint.X == 100 && EndPoint.Y == 0) 
-                {
-                    // Рисуем линию от StartPoint до ControlPoint
-                    pathFigure.Segments?.Add(new LineSegment { Point = ControlPoint });
-                }
-                
-                // 3. AwaitingEndPoint 
-                else 
-                {
+                    Point control = ControlPoint[i];     // CP_n
+                    Point end = ControlPoint[i + 1];     // P_n
+
                     pathFigure.Segments?.Add(new QuadraticBezierSegment
                     {
-                        Point1 = ControlPoint,
-                        Point2 = EndPoint
+                        Point1 = control,
+                        Point2 = end
                     });
+                    
+                }
+                else
+                {
+                    pathFigure.Segments?.Add(new LineSegment { Point = ControlPoint[i] });
                 }
             }
             
-
-            pathGeometry.Figures?.Add(pathFigure);
-            return pathGeometry;
         }
+
+        pathGeometry.Figures?.Add(pathFigure);
+        return pathGeometry;
     }
+}
 
     public void UpdateGeometry()
     {

@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Media;
 using InbresTest.Models;
 using InbresTest.Models.Curves;
 using InbresTest.Models.Primitive;
@@ -28,6 +27,7 @@ public partial class EditorViewModel : ViewModelBase
     //параметры безье
     [Reactive] private CreationMode _currentCreationMode = CreationMode.None;
     [Reactive] private BezierSquareShapeModel? _temporaryBezier;
+    [Reactive] private bool _isEnding;
     
     // состояния кривой
     public enum CreationMode
@@ -79,7 +79,6 @@ public partial class EditorViewModel : ViewModelBase
                     X = point.X,
                     Y = point.Y,
                     StartPoint = new Point(0, 0),
-                    IsBeingPlaced = true 
                 };
                 
                 TemporaryBezier.IsSelected = true; 
@@ -94,32 +93,39 @@ public partial class EditorViewModel : ViewModelBase
                     CurrentCreationMode = CreationMode.None;
                     return;
                 }
+
+                if (IsEnding)
+                {
+                    TemporaryBezier.IsBeingPlaced = false; 
+                    
+                    // отрисовка полной кривой
+                    TemporaryBezier.UpdateGeometry(); 
+                    
+                    TemporaryBezier.IsSelected = false; 
+                    TemporaryBezier.ControlPoint!.Clear();
+                    
+                    IsEnding = false;
+                    TemporaryBezier = null;
+                    CurrentCreationMode = CreationMode.None;
+                    System.Diagnostics.Debug.WriteLine("Bezier Creation Complete.");
+                    
+                    //CurrentCreationMode = CreationMode.AwaitingEndPoint;
+                    break;
+                }
                 
-                TemporaryBezier.ControlPoint = new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y);
+                TemporaryBezier.ControlPoint!.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
                 
-                // отрисовывка линии от A до B
+                // отрисовывка линии
                 TemporaryBezier.UpdateGeometry();
-                
-                CurrentCreationMode = CreationMode.AwaitingEndPoint;
                 
                 break;
 
-            case CreationMode.AwaitingEndPoint:
+            /*case CreationMode.AwaitingEndPoint:
                 if (TemporaryBezier == null) return;
                 
-                TemporaryBezier.EndPoint = new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y);
                 
-                // отрисовка полной кривой
-                TemporaryBezier.UpdateGeometry(); 
                 
-                TemporaryBezier.IsBeingPlaced = false; 
-                TemporaryBezier.IsSelected = false; 
-                
-                TemporaryBezier = null;
-                CurrentCreationMode = CreationMode.None;
-                System.Diagnostics.Debug.WriteLine("Bezier Creation Complete.");
-                
-                break;
+                break;*/
         }
     }
 

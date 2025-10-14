@@ -32,13 +32,17 @@ public partial class EditorControl : UserControl
         
         System.Diagnostics.Debug.WriteLine($"🖱️ Click at: {pos.X}, {pos.Y}");
         
+        // логика безье
         if (vm.CurrentCreationMode != EditorViewModel.CreationMode.None)
         {
+            if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonPressed) 
+                vm.IsEnding = true;
             vm.CanvasClickCommand.Execute(pos).Subscribe();
             e.Handled = true;
             return;
         }
         
+        // логика маркеров
         if (e.Source is Border handleBorder && handleBorder.DataContext is ShapeBaseModel shapeBorder)
         {
             // Проверяем, что это действительно маркер, а не часть Path
@@ -55,7 +59,7 @@ public partial class EditorControl : UserControl
             }
         }
         
-        
+        // логика нахождения фигуры
         if (e.Source is Path path && path.DataContext is ShapeBaseModel shape)
         {
             System.Diagnostics.Debug.WriteLine($"Shape found at: {pos.X}, {pos.Y}");
