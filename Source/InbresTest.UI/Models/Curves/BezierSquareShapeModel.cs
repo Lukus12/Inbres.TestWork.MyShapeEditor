@@ -11,65 +11,58 @@ public partial class BezierSquareShapeModel: ShapeBaseModel
 {
     [Reactive] private Point _startPoint;
     [Reactive] private List<Point>? _controlPoint = new(); 
-    [Reactive] private Point _endPoint;
+    [Reactive] private List<Point> _endPoint = new();
+    
     
     // свойство для отслеживания, что фигура в процессе размещения
     [Reactive] private bool _isBeingPlaced = true;
     
     public override Geometry Geometry
-{
-    get
     {
-        var pathGeometry = new PathGeometry();
-        var pathFigure = new PathFigure { StartPoint = StartPoint };
-        pathFigure.IsClosed = false;
-
-        if (ControlPoint == null) 
+        get
         {
-            return pathGeometry;
-        }
-        
-        int pointCount = ControlPoint.Count;
-
-        if (IsBeingPlaced)
-        {
-
-            if (pointCount == 0) return pathGeometry;
-
-            for (int i = 0; i < pointCount; i++)
+            var pathGeometry = new PathGeometry();
+            var pathFigure = new PathFigure
             {
-                pathFigure.Segments?.Add(new LineSegment { Point = ControlPoint[i] });
-            }
+                StartPoint = StartPoint,
+                IsClosed = false
+            };
             
-        }
-        else
-        {
-            for (int i = 0; i < pointCount; i += 2)
-            {
-                if (i + 1 < pointCount)
-                {
-                    Point control = ControlPoint[i];     // CP_n
-                    Point end = ControlPoint[i + 1];     // P_n
 
+            if (IsBeingPlaced)
+            {
+                if (ControlPoint == null) return pathGeometry;
+
+                for (int i = 0; i < ControlPoint.Count; i++)
+                {
                     pathFigure.Segments?.Add(new QuadraticBezierSegment
                     {
-                        Point1 = control,
-                        Point2 = end
+                        Point1 = ControlPoint![i],
+                        Point2 = EndPoint[i]
                     });
-                    
                 }
-                else
+            }
+            else
+            {
+                pathFigure = new PathFigure
                 {
-                    pathFigure.Segments?.Add(new LineSegment { Point = ControlPoint[i] });
+                    StartPoint = StartPoint,
+                    IsClosed = false
+                };
+                for (int i = 0; i < ControlPoint!.Count; i++)
+                {
+                    pathFigure.Segments?.Add(new QuadraticBezierSegment
+                    {
+                        Point1 = ControlPoint![i],
+                        Point2 = EndPoint[i]
+                    });
                 }
             }
             
+            pathGeometry.Figures?.Add(pathFigure);
+            return pathGeometry;
         }
-
-        pathGeometry.Figures?.Add(pathFigure);
-        return pathGeometry;
     }
-}
 
     public void UpdateGeometry()
     {

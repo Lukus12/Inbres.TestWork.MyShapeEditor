@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Linq;
+using Avalonia;
 using InbresTest.Models;
 using InbresTest.Models.Curves;
 using InbresTest.Models.Primitive;
@@ -28,6 +29,7 @@ public partial class EditorViewModel : ViewModelBase
     [Reactive] private CreationMode _currentCreationMode = CreationMode.None;
     [Reactive] private BezierSquareShapeModel? _temporaryBezier;
     [Reactive] private bool _isEnding;
+    [Reactive] private bool _isClickControlPoint = true;
     
     // состояния кривой
     public enum CreationMode
@@ -94,6 +96,13 @@ public partial class EditorViewModel : ViewModelBase
                     return;
                 }
 
+                if (IsClickControlPoint)
+                {
+                    TemporaryBezier.ControlPoint!.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
+                    IsClickControlPoint = false;
+                    return;
+                }
+
                 if (IsEnding)
                 {
                     TemporaryBezier.IsBeingPlaced = false; 
@@ -107,13 +116,22 @@ public partial class EditorViewModel : ViewModelBase
                     IsEnding = false;
                     TemporaryBezier = null;
                     CurrentCreationMode = CreationMode.None;
+                    IsClickControlPoint = true;
                     System.Diagnostics.Debug.WriteLine("Bezier Creation Complete.");
                     
                     //CurrentCreationMode = CreationMode.AwaitingEndPoint;
                     break;
                 }
                 
-                TemporaryBezier.ControlPoint!.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
+                TemporaryBezier.EndPoint.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
+                
+                if(TemporaryBezier.EndPoint.Count > 1)
+                    TemporaryBezier.ControlPoint!.Add( new Point(
+                        2 * TemporaryBezier.EndPoint[^2].X - TemporaryBezier.ControlPoint.Last().X,
+                        2 * TemporaryBezier.EndPoint[^2].Y - TemporaryBezier.ControlPoint.Last().Y
+                        ));
+                
+                
                 
                 // отрисовывка линии
                 TemporaryBezier.UpdateGeometry();
