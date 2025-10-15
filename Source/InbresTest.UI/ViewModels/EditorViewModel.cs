@@ -19,7 +19,7 @@ public partial class EditorViewModel : ViewModelBase
     // проверка клика
     [Reactive] private bool _hasClick;
     
-    // дейсвтия с фигурой
+    // действия с фигурой
     [Reactive] private ShapeBaseModel? _hasSelectedShape;
     
     // коллекция фигур
@@ -36,8 +36,7 @@ public partial class EditorViewModel : ViewModelBase
     {
         None,
         AwaitingStartPoint,
-        AwaitingControlPoint,
-        AwaitingEndPoint
+        AwaitingControlPoint
     }
     
     
@@ -111,7 +110,6 @@ public partial class EditorViewModel : ViewModelBase
                     TemporaryBezier.UpdateGeometry(); 
                     
                     TemporaryBezier.IsSelected = false; 
-                    TemporaryBezier.ControlPoint!.Clear();
                     
                     IsEnding = false;
                     TemporaryBezier = null;
@@ -124,12 +122,8 @@ public partial class EditorViewModel : ViewModelBase
                 }
                 
                 TemporaryBezier.EndPoint.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
-                
-                if(TemporaryBezier.EndPoint.Count > 1)
-                    TemporaryBezier.ControlPoint!.Add( new Point(
-                        2 * TemporaryBezier.EndPoint[^2].X - TemporaryBezier.ControlPoint.Last().X,
-                        2 * TemporaryBezier.EndPoint[^2].Y - TemporaryBezier.ControlPoint.Last().Y
-                        ));
+
+                TemporaryBezier.AddCalculationControlPoint();
                 
                 
                 
@@ -137,13 +131,6 @@ public partial class EditorViewModel : ViewModelBase
                 TemporaryBezier.UpdateGeometry();
                 
                 break;
-
-            /*case CreationMode.AwaitingEndPoint:
-                if (TemporaryBezier == null) return;
-                
-                
-                
-                break;*/
         }
     }
 
@@ -201,7 +188,7 @@ public partial class EditorViewModel : ViewModelBase
 
     private void Deselect()
     {
-        if(HasSelectedShape!=null) HasSelectedShape.IsSelected = false;
+        if(HasSelectedShape != null) HasSelectedShape.IsSelected = false;
         HasSelectedShape = null;
     }
 

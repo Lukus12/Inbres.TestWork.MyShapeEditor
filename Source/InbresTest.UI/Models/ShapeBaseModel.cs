@@ -13,7 +13,7 @@ public abstract partial class ShapeBaseModel : ReactiveObject
 
     [Reactive] public partial double X { get; set; }
     [Reactive] public partial double Y { get; set; }
-    
+
     public virtual double Width { get; set; }
 
     public virtual double Height { get; set; }
@@ -24,7 +24,7 @@ public abstract partial class ShapeBaseModel : ReactiveObject
     
     
     public string Stroke => IsSelected ? "MediumBlue" : "Black";
-    public double StrokeThickness => IsSelected ? 3 : 1;
+    public double StrokeThickness => IsSelected ? 5 : 3;
 
     [Reactive]
     public bool IsSelected
