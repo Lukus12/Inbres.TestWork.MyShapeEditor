@@ -1,17 +1,22 @@
-name: Build Native AOT
+name: Publish Native AOT Release
 
 on:
-  workflow_dispatch:
   release:
-    types: [published]
+    types: [published] 
 
 jobs:
-  build:
+  publish:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        runtime: [win-x64, linux-x64]
-    runs-on: ${{ matrix.os }}
+        include:
+          - os: windows-latest
+            runtime: win-x64
+            asset_name: your-app-win-x64.zip
+          - os: ubuntu-latest
+            runtime: linux-x64
+            asset_name: your-app-linux-x64.zip
 
     steps:
       - name: Checkout
@@ -20,27 +25,20 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '8.0.x'  # или 9.0.x
 
-      - name: Publish AOT
-        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
+      - name: Publish Native AOT
+        run: dotnet publish -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
 
-      - name: Zip artifact
+      - name: Zip artifacts
         shell: bash
         run: |
-          cd ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish
-          zip -r ../../../InbresTest-${{ matrix.runtime }}.zip .
+          cd ./bin/Release/net8.0/${{ matrix.runtime }}/publish
+          zip -r ../../../${{ matrix.asset_name }} .
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: InbresTest-${{ matrix.runtime }}
-          path: ./Source/InbresTest.StartApp/bin/Release/net9.0/InbresTest-${{ matrix.runtime }}.zip
-
-      - name: Upload to Release (if triggered by release)
-        if: github.event_name == 'release'
+      - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./Source/InbresTest.StartApp/bin/Release/net9.0/InbresTest-${{ matrix.runtime }}.zip
+          files: ./bin/Release/net8.0/${{ matrix.asset_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
