@@ -14,7 +14,7 @@ jobs:
             runtime: win-x64
             asset_name: InbresTest-win-x64.zip
           - os: ubuntu-latest
-            runtime: linux-x64      
+            runtime: linux-x64
             asset_name: InbresTest-linux-x64.zip
 
     runs-on: ${{ matrix.os }}
@@ -31,15 +31,18 @@ jobs:
       - name: Publish AOT
         run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
 
+      - name: Debug: show publish contents
+        run: ls -la ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish/
+
       - name: Create ZIP
         shell: bash
         run: |
-          cd ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish
-          zip -r ../../../../../${{ matrix.asset_name }} .
+          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish"
+          zip -r "${{ matrix.asset_name }}" -j "$PUBLISH_DIR"/*
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.asset_name }} 
+          files: ${{ matrix.asset_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
