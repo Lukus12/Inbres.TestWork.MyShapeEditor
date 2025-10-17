@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-      <AvaloniaResource Include="Styles\**"/>
+    <AvaloniaResource Include="Styles\**"/>
   </ItemGroup>
 
   <ItemGroup>
