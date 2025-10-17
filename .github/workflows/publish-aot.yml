@@ -20,11 +20,11 @@ jobs:
         run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r win-x64 -c Release
 
       - name: Create ZIP (Windows)
-        shell: bash 
+        shell: powershell
         run: |
-          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/win-x64/publish"
-          # Если 'zip' не найден, попробуйте использовать PowerShell команды для архивирования
-          zip -r "InbresTest-win-x64.zip" -j "$PUBLISH_DIR"/*
+          $PUBLISH_DIR = "./Source/InbresTest.StartApp/bin/Release/net9.0/win-x64/publish"
+          # Используем Compress-Archive, нативный инструмент Windows
+          Compress-Archive -Path "$PUBLISH_DIR\*" -DestinationPath "InbresTest-win-x64.zip" -Force
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
