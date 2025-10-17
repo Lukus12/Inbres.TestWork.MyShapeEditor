@@ -31,7 +31,7 @@ jobs:
       - name: Publish AOT
         run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
 
-      - name: Debug: show publish contents
+      - name: Debug Contens
         run: ls -la ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish/
 
       - name: Create ZIP
