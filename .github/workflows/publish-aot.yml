@@ -6,7 +6,6 @@ on:
 
 jobs:
   publish:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
@@ -15,22 +14,24 @@ jobs:
             runtime: win-x64
             asset_name: InbresTest-win-x64.zip
           - os: ubuntu-latest
-            runtime: linux-x64
+            runtime: linux-x64      
             asset_name: InbresTest-linux-x64.zip
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish Native AOT
+      - name: Publish AOT
         run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
 
-      - name: Zip artifacts
+      - name: Create ZIP
         shell: bash
         run: |
           cd ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish
@@ -39,6 +40,6 @@ jobs:
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.asset_name }}
+          files: ${{ matrix.asset_name }} 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
