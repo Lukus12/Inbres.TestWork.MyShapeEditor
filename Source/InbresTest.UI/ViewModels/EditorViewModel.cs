@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using Avalonia;
 using InbresTest.Models;
 using InbresTest.Models.Curves;
 using InbresTest.Models.Primitive;
-using ReactiveUI;
+using InbresTest.Models.Serialization;
 using ReactiveUI.SourceGenerators;
 
 namespace InbresTest.ViewModels;
@@ -39,6 +42,11 @@ public partial class EditorViewModel : ViewModelBase
         AwaitingControlPoint
     }
     
+    public EditorViewModel()
+    {
+        LoadDataShapeCommand.Execute().Subscribe();
+    }
+
     
     // команды
     
@@ -97,7 +105,7 @@ public partial class EditorViewModel : ViewModelBase
 
                 if (IsClickControlPoint)
                 {
-                    TemporaryBezier.ControlPoint!.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
+                    TemporaryBezier.ControlPoint.Add(new Point(point.X - TemporaryBezier.X, point.Y - TemporaryBezier.Y));
                     IsClickControlPoint = false;
                     return;
                 }
@@ -215,5 +223,57 @@ public partial class EditorViewModel : ViewModelBase
     {
         if(HasSelectedShape == null) return;
         HasSelectedShape.ChangeColor();
+    }
+
+    private string _filePath = "../shapeData.json";
+    
+    [ReactiveCommand]
+    private void SaveDataShape()
+    {
+        List<ShapeData> jsonShapes = new();
+
+        for (int i = 0; i < Shapes.Count; i++)
+        {
+            jsonShapes.Add(Shapes[i].CreateSerializationData());
+        }
+
+        string jsonData = JsonSerializer.Serialize(
+            jsonShapes,
+            ShapeJsonContext.Default.ListShapeData
+            );
+        
+        File.WriteAllText(_filePath, jsonData);
+    }
+
+    [ReactiveCommand]
+    private void LoadDataShape()
+    {
+        string json = File.ReadAllText(_filePath);
+        var deserializedData = JsonSerializer.Deserialize(json, ShapeJsonContext.Default.ListShapeData);
+        ShapeBaseModel shape;
+        
+        foreach (ShapeData shapeData in deserializedData)
+        {
+            switch (shapeData.TypeDiscriminator)
+            {
+                case "RectangleShapeModel":
+                    shape = new RectangleShapeModel();
+                    break;
+                
+                case "EllipseShapeModel":
+                    shape = new EllipseShapeModel();
+                    break;
+                
+                case "BezierSquareShapeModel":
+                    shape = new BezierSquareShapeModel();
+                    break;
+                default:
+                    shape = null;
+                    return;
+            }
+
+            shape.RestoreFromData(shapeData);
+            Shapes.Add(shape);
+        }
     }
 }

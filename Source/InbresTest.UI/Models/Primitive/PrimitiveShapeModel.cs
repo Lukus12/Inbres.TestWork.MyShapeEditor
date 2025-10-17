@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using InbresTest.Models.Serialization;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -81,5 +82,30 @@ public abstract partial class PrimitiveShapeModel: ShapeBaseModel
     public override void ChangeColor()
     {
         Fill = _color[_indexColor++ % _color.Length];
+    }
+    
+    public override ShapeData CreateSerializationData()
+    {
+        return new PrimitiveShapeData
+        {
+            X = X,
+            Y = Y,
+            Width = Width,
+            Height = Height,
+            Fill = Fill,
+            TypeDiscriminator = GetType().Name,
+        };
+    }
+    
+    public override void RestoreFromData(ShapeData data)
+    {
+        if (data is not PrimitiveShapeData primitiveData) return;
+        
+        X = primitiveData.X;
+        Y = primitiveData.Y;
+        Width = primitiveData.Width;
+        Height = primitiveData.Height;
+        Fill = primitiveData.Fill;
+        
     }
 }

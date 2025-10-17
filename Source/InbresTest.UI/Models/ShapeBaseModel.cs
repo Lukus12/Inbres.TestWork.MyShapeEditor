@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using InbresTest.Models.Serialization;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -39,6 +40,9 @@ public abstract partial class ShapeBaseModel : ReactiveObject
         }
     }
 
+    // Для сериализации
+    public abstract ShapeData CreateSerializationData();
+    public abstract void RestoreFromData(ShapeData data);
 
     public void MoveTo(Point delta)
     {

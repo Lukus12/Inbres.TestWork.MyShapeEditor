@@ -78,7 +78,8 @@ public partial class EditorControl : UserControl
             
             _draggedShape = null;
         }
-        
+
+        //vm.SaveDataShapeCommand.Execute().Subscribe();
     }
     
     private void ClickItem_PointerMoved(object? sender, PointerEventArgs e)
