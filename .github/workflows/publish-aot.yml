@@ -33,29 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Publish AOT (Linux)
-        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r linux-x64 -c Release
-
-      - name: Create ZIP (Linux)
-        shell: bash
-        run: |
-          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/linux-x64/publish"
-          zip -r "InbresTest-linux-x64.zip" -j "$PUBLISH_DIR"/*
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: InbresTest-linux-x64.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
