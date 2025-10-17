@@ -1,0 +1,46 @@
+name: Build Native AOT
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        runtime: [win-x64, linux-x64]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish AOT
+        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
+
+      - name: Zip artifact
+        shell: bash
+        run: |
+          cd ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish
+          zip -r ../../../InbresTest-${{ matrix.runtime }}.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: InbresTest-${{ matrix.runtime }}
+          path: ./Source/InbresTest.StartApp/bin/Release/net9.0/InbresTest-${{ matrix.runtime }}.zip
+
+      - name: Upload to Release (if triggered by release)
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./Source/InbresTest.StartApp/bin/Release/net9.0/InbresTest-${{ matrix.runtime }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
