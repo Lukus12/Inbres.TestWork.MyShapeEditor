@@ -5,19 +5,8 @@ on:
     types: [published]
 
 jobs:
-  publish:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            runtime: win-x64
-            asset_name: InbresTest-win-x64.zip
-          - os: ubuntu-latest
-            runtime: linux-x64
-            asset_name: InbresTest-linux-x64.zip
-
-    runs-on: ${{ matrix.os }}  
-
+  build-win:
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,21 +16,45 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish AOT
-        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
+      - name: Publish AOT (Windows)
+        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r win-x64 -c Release
 
-      - name: Debug Contents
-        run: ls -la ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish/
-
-      - name: Create ZIP
+      - name: Create ZIP (Windows)
         shell: bash
         run: |
-          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish"
-          zip -r "${{ matrix.asset_name }}" -j "$PUBLISH_DIR"/*
+          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/win-x64/publish"
+          zip -r "InbresTest-win-x64.zip" -j "$PUBLISH_DIR"/*
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.asset_name }}
+          files: InbresTest-win-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish AOT (Linux)
+        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r linux-x64 -c Release
+
+      - name: Create ZIP (Linux)
+        shell: bash
+        run: |
+          PUBLISH_DIR="./Source/InbresTest.StartApp/bin/Release/net9.0/linux-x64/publish"
+          zip -r "InbresTest-linux-x64.zip" -j "$PUBLISH_DIR"/*
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: InbresTest-linux-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
