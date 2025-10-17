@@ -2,7 +2,7 @@ name: Publish Native AOT Release
 
 on:
   release:
-    types: [published] 
+    types: [published]
 
 jobs:
   publish:
@@ -13,10 +13,10 @@ jobs:
         include:
           - os: windows-latest
             runtime: win-x64
-            asset_name: your-app-win-x64.zip
+            asset_name: InbresTest-win-x64.zip
           - os: ubuntu-latest
             runtime: linux-x64
-            asset_name: your-app-linux-x64.zip
+            asset_name: InbresTest-linux-x64.zip
 
     steps:
       - name: Checkout
@@ -28,17 +28,17 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Publish Native AOT
-        run: dotnet publish -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
+        run: dotnet publish ./Source/InbresTest.StartApp/InbresTest.StartApp.csproj -p:PublishAot=true -r ${{ matrix.runtime }} -c Release
 
       - name: Zip artifacts
         shell: bash
         run: |
-          cd ./bin/Release/net9.0/${{ matrix.runtime }}/publish
-          zip -r ../../../${{ matrix.asset_name }} .
+          cd ./Source/InbresTest.StartApp/bin/Release/net9.0/${{ matrix.runtime }}/publish
+          zip -r ../../../../../${{ matrix.asset_name }} .
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./bin/Release/net9.0/${{ matrix.asset_name }}
+          files: ${{ matrix.asset_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
