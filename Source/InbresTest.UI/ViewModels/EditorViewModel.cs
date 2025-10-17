@@ -225,7 +225,7 @@ public partial class EditorViewModel : ViewModelBase
         HasSelectedShape.ChangeColor();
     }
 
-    private string _filePath = "../shapeData.json";
+    private string _filePath = Path.Combine(AppContext.BaseDirectory, "shapeData.json");
     
     [ReactiveCommand]
     private void SaveDataShape()
@@ -248,6 +248,12 @@ public partial class EditorViewModel : ViewModelBase
     [ReactiveCommand]
     private void LoadDataShape()
     {
+        if (!File.Exists(_filePath))
+        {
+            Console.WriteLine($"Файл данных не найден: {_filePath}. Создаём новую сцену.");
+            return;
+        }
+        
         string json = File.ReadAllText(_filePath);
         var deserializedData = JsonSerializer.Deserialize(json, ShapeJsonContext.Default.ListShapeData);
         ShapeBaseModel shape;
